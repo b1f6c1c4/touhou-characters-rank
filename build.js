@@ -12,20 +12,53 @@ const parser = new XMLParser({
 });
 source.pipe(gunzip);
 
+const colors = {
+  '': '#c9cbcf',
+  1: '#ffcd56',
+  2: '#4bc0c0',
+  3: '#a5f43b',
+  4: '#36a2eb',
+  5: '#ff9f40',
+  6: '#ff6384',
+  EX: '#9966ff',
+};
+
 async function process() {
   const chars = {};
   const sheets = {};
   const ex = {};
   parser.parse(await buffer(gunzip))['gnm:Workbook']['gnm:Sheets']['gnm:Sheet'].forEach(({ ['gnm:Name']: nm, ['gnm:Cells']: { ['gnm:Cell'] : cl } }) => {
     if (nm === 'char') {
-      let dt, gm;
+      let dt, gm, co;
       cl.forEach(({ ['@Row']: r, ['@Col']: c, ['#text']: t }) => {
         if (c == 0)
           gm = t;
         else if (c == 1)
           dt = new Date(Date.UTC(0, 0, t-1))
+        else if (c == 2)
+          co = t;
         else if (!(t in chars))
-          chars[t] = { gm, dt, g: [], v: 0, dtxx: undefined };
+          chars[t] = {
+            gm,
+            dt,
+            g: [],
+            v: 0,
+            dtxx: undefined,
+            color: gm === 'special' ? co : colors[''],
+            co,
+          };
+      });
+    } else if (nm === 'stage') {
+      let ch;
+      cl.forEach(({ ['@Row']: r, ['@Col']: c, ['#text']: t }) => {
+        if (c == 0)
+          ch = t;
+        else if (c == 1) {
+          if (chars[ch].color !== colors[''])
+            console.dir(ch);
+          else
+            chars[ch].color = colors[t];
+        }
       });
     } else {
       const dt = new Date(nm);
@@ -41,7 +74,7 @@ async function process() {
         }
       });
       for (const ch in votes) {
-        const vv = votes[ch] / totalVotes;
+        const vv = votes[ch] / totalVotes * cl.length / 2;
         if (!(ch in chars)) {
           if (!(ch in ex))
             ex[ch] = 0;
@@ -65,7 +98,7 @@ async function process() {
     }
   });
   const series = [];
-  Object.entries(chars).sort((a, b) => b[1].v - a[1].v).forEach(([ch, { g, gm, dt, v }]) => {
+  Object.entries(chars).forEach(([ch, { g, gm, dt, v, color, co }]) => {
     if (g.length >= 2)
       series.push({
         label: ch,
@@ -73,6 +106,8 @@ async function process() {
           x: (x / 86400000 / 365.2425 * 12),
           y: Math.round(1000 * Math.log(y)) / 1000,
         })),
+        borderColor: color,
+        backgroundColor: co,
       });
   });
   return JSON.stringify(series);

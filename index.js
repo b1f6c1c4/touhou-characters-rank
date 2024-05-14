@@ -1,7 +1,7 @@
 fetch('/touhou.json').then(async (res) => {
   const series = await res.json();
   series.forEach(s => {
-    s.borderWidth = 1;
+    s.borderWidth = 2;
     s.showLine = true;
   });
   const options = {
@@ -19,8 +19,8 @@ fetch('/touhou.json').then(async (res) => {
         },
         y: {
           type: 'linear',
-          min: -9,
-          max: -1,
+          min: -3.5,
+          max: 2.5,
         }
       }
     }

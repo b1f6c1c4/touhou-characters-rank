@@ -1,14 +1,16 @@
 {
   "name": "touhou-characters-rank",
   "version": "0.0.0",
-  "main": "index.js",
+  "main": "build.js",
+  "private": true,
   "scripts": {
-    "build": "node index.js"
+    "build": "node build.js"
   },
   "author": "",
   "license": "cc0-1.0",
   "description": "Touhou Project characters ranked by overall popularity",
   "dependencies": {
-    "fast-xml-parser": "^4.3.6"
+    "fast-xml-parser": "^4.3.6",
+    "uplot": "^1.6.30"
   }
 }

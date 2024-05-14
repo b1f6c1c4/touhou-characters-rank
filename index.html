@@ -1,38 +1,14 @@
+<!DOCTYPE html>
 <html>
-<head>
-  <link rel="preload" href="/touhou.json" as="fetch">
-  <script src="https://cdn.jsdelivr.net/npm/uplot"></script>
-</head>
-<body style="height: 100vh">
-  <div id="chart"></div>
-  <script>
-  const options = {
-    series: [],
-    chart: {
-      height: '100%',
-      type: 'line',
-      zoom: {
-        enabled: false
-      },
-      toolbar: {
-        show: false
-      },
-      animations: {
-        enabled: false,
-      },
-    },
-    stroke: {
-      width: 1,
-    },
-    yaxis: {
-      min: -9,
-      max: -1,
-      forceNiceScale: true,
-      decimalsInFloat: 1,
-    },
-  };
-    const chart = new ApexCharts(document.querySelector("#chart"), options);
-    chart.render();
-  </script>
-</body>
+  <head lang="zh">
+    <meta charset="utf-8" />
+    <link rel="preload" as="fetch" href="/touhou.json" crossOrigin="anonymous">
+    <meta name="description" content="Touhou Project characters ranked by overall popularity" />
+    <link rel="stylesheet" href="/uPlot.css">
+    <script defer src="/uPlot.js"></script>
+    <script defer src="/index.js"></script>
+  </head>
+  <body style="height: 100vh">
+    <div id="chart"></div>
+  </body>
 </html>

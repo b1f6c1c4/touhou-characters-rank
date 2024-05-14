@@ -3,12 +3,20 @@
   <head lang="zh">
     <meta charset="utf-8" />
     <link rel="preload" as="fetch" href="/touhou.json" crossOrigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Touhou Project characters ranked by overall popularity" />
-    <link rel="stylesheet" href="/uPlot.css">
-    <script defer src="/uPlot.js"></script>
+    <script defer src="/chart.umd.js"></script>
     <script defer src="/index.js"></script>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
   </head>
-  <body style="height: 100vh">
-    <div id="chart"></div>
+  <body>
+    <canvas id="chart"></canvas>
   </body>
 </html>

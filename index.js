@@ -1,29 +1,30 @@
 fetch('/touhou.json').then(async (res) => {
+  const series = await res.json();
+  series.forEach(s => {
+    s.borderWidth = 1;
+    s.showLine = true;
+  });
   const options = {
-    series: await res.json(),
-    chart: {
-      height: '100%',
-      type: 'line',
-      zoom: {
-        enabled: false
-      },
-      toolbar: {
-        show: false
-      },
-      animations: {
-        enabled: false,
-      },
+    type: 'scatter',
+    data: {
+      datasets: series,
     },
-    stroke: {
-      width: 1,
-    },
-    yaxis: {
-      min: -9,
-      max: -1,
-      forceNiceScale: true,
-      decimalsInFloat: 1,
-    },
+    options: {
+      animation: false,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          min: 0,
+          max: 260,
+        },
+        y: {
+          type: 'linear',
+          min: -9,
+          max: -1,
+        }
+      }
+    }
   };
-  const chart = new ApexCharts(document.querySelector("#chart"), options);
-  chart.render();
+  console.dir(options);
+  new Chart(document.getElementById('chart'), options);
 });

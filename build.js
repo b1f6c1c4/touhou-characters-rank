@@ -68,7 +68,7 @@ async function process() {
   Object.entries(chars).sort((a, b) => b[1].v - a[1].v).forEach(([ch, { g, gm, dt, v }]) => {
     if (g.length >= 2)
       series.push({
-        name: ch,
+        label: ch,
         data: g.map(([x, y]) => ({
           x: (x / 86400000 / 365.2425 * 12),
           y: Math.round(1000 * Math.log(y)) / 1000,
@@ -80,9 +80,9 @@ async function process() {
 
 fs.rm('dist/', { recursive: true, force: true }).then(() =>
   fs.mkdir('dist/', { recursive: true }).then(() => Promise.all([
-    fs.copyFile('index.html', 'dist/index.html'),
-    fs.copyFile('index.js', 'dist/index.js'),
-    fs.copyFile('node_modules/uplot/dist/uPlot.iife.min.js', 'dist/uPlot.js'),
-    fs.copyFile('node_modules/uplot/dist/uPlot.min.css', 'dist/uPlot.css'),
+    fs.link('index.html', 'dist/index.html'),
+    fs.link('index.js', 'dist/index.js'),
+    fs.link('node_modules/chart.js/dist/chart.umd.js', 'dist/chart.umd.js'),
+    fs.link('node_modules/chart.js/dist/chart.umd.js.map', 'dist/chart.umd.js.map'),
     process().then((res) => fs.writeFile('dist/touhou.json', res)),
   ])));

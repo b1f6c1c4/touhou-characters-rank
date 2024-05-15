@@ -27,26 +27,36 @@ async function process() {
   const chars = {};
   const sheets = {};
   const ex = {};
-  parser.parse(await buffer(gunzip))['gnm:Workbook']['gnm:Sheets']['gnm:Sheet'].forEach(({ ['gnm:Name']: nm, ['gnm:Cells']: { ['gnm:Cell'] : cl } }) => {
+  const [logos, workbook] = await Promise.all([
+    fs.readFile('logo.json'),
+    buffer(gunzip),
+  ]);
+  const logo = JSON.parse(logos);
+  parser.parse(workbook)['gnm:Workbook']['gnm:Sheets']['gnm:Sheet'].forEach(({ ['gnm:Name']: nm, ['gnm:Cells']: { ['gnm:Cell'] : cl } }) => {
     if (nm === 'char') {
-      let dt, gm, co;
+      let dt, gm, co, special;
       cl.forEach(({ ['@Row']: r, ['@Col']: c, ['#text']: t }) => {
-        if (c == 0)
+        if (c == 0) {
           gm = t;
-        else if (c == 1)
+          special = false;
+        } else if (c == 1)
           dt = new Date(Date.UTC(0, 0, t-1))
         else if (c == 2)
           co = t;
-        else if (!(t in chars))
+        else if (c == 3)
+          special = t == 'special';
+        else if (!(t in chars)) {
           chars[t] = {
             gm,
             dt,
             g: [],
             v: 0,
             dtxx: undefined,
-            color: gm === 'special' ? co : colors[''],
+            color: special ? co : colors[''],
             co,
+            url: logo['/'+t],
           };
+        }
       });
     } else if (nm === 'stage') {
       let ch;
@@ -54,10 +64,10 @@ async function process() {
         if (c == 0)
           ch = t;
         else if (c == 1) {
-          if (chars[ch].color !== colors[''])
-            console.dir(ch);
-          else
+          if (chars[ch].color === colors['']) {
             chars[ch].color = colors[t];
+            chars[ch].stage = t;
+          }
         }
       });
     } else {
@@ -98,7 +108,7 @@ async function process() {
     }
   });
   const series = [];
-  Object.entries(chars).forEach(([ch, { g, gm, dt, v, color, co }]) => {
+  Object.entries(chars).forEach(([ch, { g, gm, dt, v, color, co, url, stage }]) => {
     if (g.length >= 2)
       series.push({
         label: ch,
@@ -108,6 +118,13 @@ async function process() {
         })),
         borderColor: color,
         backgroundColor: co,
+        aux: {
+          url,
+          gm,
+          dt,
+          v,
+          stage,
+        },
       });
   });
   return JSON.stringify(series);
@@ -119,5 +136,6 @@ fs.rm('dist/', { recursive: true, force: true }).then(() =>
     fs.link('index.js', 'dist/index.js'),
     fs.link('node_modules/chart.js/dist/chart.umd.js', 'dist/chart.umd.js'),
     fs.link('node_modules/chart.js/dist/chart.umd.js.map', 'dist/chart.umd.js.map'),
+    fs.link('node_modules/mustache/mustache.min.js', 'dist/mustache.js'),
     process().then((res) => fs.writeFile('dist/touhou.json', res)),
   ])));

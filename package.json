@@ -11,6 +11,7 @@
   "description": "Touhou Project characters ranked by overall popularity",
   "dependencies": {
     "chart.js": "^4.4.2",
-    "fast-xml-parser": "^4.3.6"
+    "fast-xml-parser": "^4.3.6",
+    "mustache": "^4.2.0"
   }
 }

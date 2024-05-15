@@ -134,6 +134,7 @@ fs.rm('dist/', { recursive: true, force: true }).then(() =>
   fs.mkdir('dist/', { recursive: true }).then(() => Promise.all([
     fs.link('index.html', 'dist/index.html'),
     fs.link('index.js', 'dist/index.js'),
+    fs.link('index.css', 'dist/index.css'),
     fs.link('node_modules/chart.js/dist/chart.umd.js', 'dist/chart.umd.js'),
     fs.link('node_modules/chart.js/dist/chart.umd.js.map', 'dist/chart.umd.js.map'),
     fs.link('node_modules/mustache/mustache.min.js', 'dist/mustache.js'),

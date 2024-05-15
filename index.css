@@ -1,0 +1,81 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+}
+#tooltip {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 3px;
+  justify-content: center;
+  z-index: 114;
+}
+#tooltip > div {
+  display: flex;
+  flex-direction: row;
+  border-style: solid;
+  border-width: 7px;
+  padding: 0 4px;
+  min-width: fit-content;
+  gap: 6px;
+  box-sizing: content-box;
+  height: 100px;
+}
+#tooltip .desc {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  min-width: fit-content;
+}
+#tooltip .desc .fill {
+  flex: 1;
+}
+#tooltip .desc a {
+  all: unset;
+  cursor: pointer;
+}
+#tooltip .desc a:last-child {
+  font-size: 8px;
+  align-self: flex-end;
+}
+#tooltip img {
+  filter: drop-shadow(3px 0 0 white)
+  drop-shadow(0 3px 0 white)
+  drop-shadow(-3px 0 0 white)
+  drop-shadow(0 -3px 0 white);
+  width: 100px;
+  height: 100px;
+}
+#tooltip .desc > .nm-lg {
+  font-size: 1.8em;
+}
+#tooltip .desc > .nm-md {
+  font-size: 1.5em;
+}
+#tooltip .desc > .nm-sm {
+  font-size: 1.2em;
+}
+#tooltip .nm-x {
+  margin-top: -0.1em;
+  font-size: 0.8em;
+}
+#close {
+  position: fixed;
+  left: 5px;
+  bottom: 5px;
+  font-size: 30px;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: purple;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  visibility: hidden;
+  cursor: pointer;
+}

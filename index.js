@@ -1,3 +1,4 @@
+const tooltipEl = document.getElementById('tooltip');
 const tmpl = document.getElementById('tooltip-tmpl').innerHTML;
 const closer = document.getElementById('close');
 function getContrastColor(c) {
@@ -53,9 +54,6 @@ fetch('/touhou.json').then(async (res) => {
         tooltip: {
           enabled: false,
           external(context) {
-            // Tooltip Element
-            let tooltipEl = document.getElementById('tooltip');
-
             // Hide if no tooltip
             const tooltipModel = context.tooltip;
             if (tooltipModel.opacity === 0) {
@@ -165,4 +163,5 @@ fetch('/touhou.json').then(async (res) => {
     closer.style.visibility = 'hidden';
     theChart.update();
   });
+  document.querySelector('h1').remove();
 });

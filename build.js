@@ -40,10 +40,12 @@ async function process() {
           gm = t;
           special = false;
         } else if (c == 1)
-          dt = new Date(Date.UTC(0, 0, t-1))
+          ;
         else if (c == 2)
-          co = t;
+          dt = new Date(Date.UTC(0, 0, t-1))
         else if (c == 3)
+          co = t;
+        else if (c == 4)
           special = t == 'special';
         else if (!(t in chars)) {
           chars[t] = {
@@ -103,7 +105,6 @@ async function process() {
         if (dt < obj.dt)
           continue;
         obj.g.push([dt - obj.dt, Math.exp(-10)]);
-        console.error({ ch, nm });
       }
     }
   });

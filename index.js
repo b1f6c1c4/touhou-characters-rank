@@ -15,6 +15,7 @@ function scaled(v) {
 }
 Mustache.parse(tmpl);
 fetch('/touhou.json').then(async (res) => {
+  let partial = new Set();
   const series = await res.json();
   series.forEach(s => {
     s.borderWidth = scaled(2);
@@ -59,15 +60,46 @@ fetch('/touhou.json').then(async (res) => {
             padding: scaled(3),
             boxWidth: scaled(7),
           },
+          onClick(e, legendItem, legend) {
+            theChart.setActiveElements([]);
+            const i = legendItem.datasetIndex;
+            if (partial.has(i))
+              partial.delete(i);
+            else
+              partial.add(i);
+            tooltipEl.style.display = 'none';
+            if (partial.size)
+              closer.style.visibility = 'visible';
+            else
+              closer.style.visibility = 'hidden';
+            series.forEach(s => {
+              s.order = 1;
+              s.borderWidth = partial.size ? 0.1 : scaled(2);
+              s.pointRadius = scaled(3);
+            });
+            partial.forEach(a => {
+              const obj = series[a];
+              obj.borderWidth = scaled(5);
+              obj.pointRadius = scaled(8);
+            });
+            theChart.update();
+          },
         },
         tooltip: {
           enabled: false,
           external(context) {
             // Hide if no tooltip
             const tooltipModel = context.tooltip;
-            if (tooltipModel.opacity === 0) {
+            const ids = new Map();
+            tooltipModel.body?.forEach((bi, i) => {
+              const v = tooltipModel.dataPoints[i].datasetIndex;
+              if (!partial.size || partial.has(v))
+                ids.set(v, i);
+            });
+            if (!ids.size || tooltipModel.opacity === 0) {
               tooltipEl.style.display = 'none';
-              closer.style.visibility = 'hidden';
+              if (!partial.size)
+                closer.style.visibility = 'hidden';
               return;
             }
 
@@ -80,34 +112,30 @@ fetch('/touhou.json').then(async (res) => {
             }
 
             // Set Text
-            let ids = new Map();
-            if (tooltipModel.body) {
-              tooltipModel.body.forEach((bi, i) => ids.set(tooltipModel.dataPoints[i].datasetIndex, i));
-              tooltipEl.innerHTML = Mustache.render(tmpl, {
-                title: tooltipModel.title || [],
-                body: Array.from(ids, ([id, i]) => {
-                  const colors = tooltipModel.labelColors[i];
-                  const style = `
+            tooltipEl.innerHTML = Mustache.render(tmpl, {
+              title: tooltipModel.title || [],
+              body: Array.from(ids, ([id, i]) => {
+                const colors = tooltipModel.labelColors[i];
+                const style = `
                     background: ${colors.backgroundColor.substring(0, 7)};
                     border-color: ${colors.borderColor.substring(0, 7)};
                     color: ${getContrastColor(colors.backgroundColor)};
                   `;
-                  const { label, aux } = series[id];
-                  const m = label.match(/^(?<l>[^（）]*)(?<l2>（.*）)?$/);
-                  const { l, l2 } = m.groups;
-                  return {
-                    style,
-                    cls: l.length <= 4 ? 'nm-lg' : l.length <= 6 ? 'nm-md' : 'nm-sm',
-                    multi: Array.isArray(aux.url) ? 'multi' : '',
-                    label: l,
-                    label2: l2,
-                    ...aux,
-                    dt: new Date(aux.dt).toISOString().replace(/T.*/, ''),
-                    v: Math.round(Math.log(aux.v) * 1000) / 1000,
-                  };
-                }),
-              });
-            }
+                const { label, aux } = series[id];
+                const m = label.match(/^(?<l>[^（）]*)(?<l2>（.*）)?$/);
+                const { l, l2 } = m.groups;
+                return {
+                  style,
+                  cls: l.length <= 4 ? 'nm-lg' : l.length <= 6 ? 'nm-md' : 'nm-sm',
+                  multi: Array.isArray(aux.url) ? 'multi' : '',
+                  label: l,
+                  label2: l2,
+                  ...aux,
+                  dt: new Date(aux.dt).toISOString().replace(/T.*/, ''),
+                  v: Math.round(Math.log(aux.v) * 1000) / 1000,
+                };
+              }),
+            });
 
             const position = context.chart.canvas.getBoundingClientRect();
             const bodyFont = Chart.helpers.toFont(tooltipModel.options.bodyFont);
@@ -145,7 +173,9 @@ fetch('/touhou.json').then(async (res) => {
           },
         },
       },
-      onHover: (e, as, chart) => {
+      onHover(e, as, chart) {
+        if (partial.size)
+          return;
         const ge = as.flatMap(a => series[a.datasetIndex].aux.group);
         series.forEach(s => {
           s.order = 1;
@@ -164,6 +194,12 @@ fetch('/touhou.json').then(async (res) => {
   };
   const theChart = new Chart(document.getElementById('chart'), options);
   closer.addEventListener('click', () => {
+    if (partial.size && theChart.getActiveElements().length) {
+      theChart.setActiveElements([]);
+      tooltipEl.style.display = 'none';
+      return;
+    }
+    partial.clear();
     theChart.setActiveElements([]);
     series.forEach(s => {
       s.order = 1;

@@ -20,7 +20,11 @@
       {{/title}}
       {{#body}}
       <div style="{{style}}">
-        <a href="https://thwiki.cc/{{label}}" target="_blank"><img src="{{url}}"></a>
+        <a href="https://thwiki.cc/{{label}}" target="_blank" class="{{multi}}">
+          {{#url}}
+          <img src="{{.}}">
+          {{/url}}
+        </a>
         <div class="desc">
           <a href="https://thwiki.cc/{{label}}" target="_blank" class="{{cls}}">{{label}}</a>
           {{#label2}}<span class="nm-x">{{label2}}</span>{{/label2}}

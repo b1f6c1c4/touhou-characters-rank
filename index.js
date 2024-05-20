@@ -19,6 +19,12 @@ fetch('/touhou.json').then(async (res) => {
     s.order = 1;
     s.tension = 0.3;
     s.pointRadius = 3;
+    if (s.aux.group)
+      s.borderDash = [5, 5];
+    if (s.aux.grouped) {
+      s.borderColor += '33';
+      s.backgroundColor += '33';
+    }
   });
   const options = {
     type: 'scatter',
@@ -26,7 +32,7 @@ fetch('/touhou.json').then(async (res) => {
       datasets: series,
     },
     options: {
-      pointHitRadius: 9,
+      pointHitRadius: Math.min(window.innerWidth, window.innerHeight) > 1000 ? 9 : undefined,
       animation: false,
       maintainAspectRatio: false,
       scales: {
@@ -79,8 +85,8 @@ fetch('/touhou.json').then(async (res) => {
                 body: Array.from(ids, ([id, i]) => {
                   const colors = tooltipModel.labelColors[i];
                   const style = `
-                    background: ${colors.backgroundColor};
-                    border-color: ${colors.borderColor};
+                    background: ${colors.backgroundColor.substring(0, 7)};
+                    border-color: ${colors.borderColor.substring(0, 7)};
                     color: ${getContrastColor(colors.backgroundColor)};
                   `;
                   const { label, aux } = series[id];
@@ -89,6 +95,7 @@ fetch('/touhou.json').then(async (res) => {
                   return {
                     style,
                     cls: l.length <= 4 ? 'nm-lg' : l.length <= 6 ? 'nm-md' : 'nm-sm',
+                    multi: Array.isArray(aux.url) ? 'multi' : '',
                     label: l,
                     label2: l2,
                     ...aux,
@@ -136,9 +143,10 @@ fetch('/touhou.json').then(async (res) => {
         },
       },
       onHover: (e, as, chart) => {
+        const ge = as.flatMap(a => series[a.datasetIndex].aux.group);
         series.forEach(s => {
           s.order = 1;
-          s.borderWidth = as.length ? 0.1 : 2;
+          s.borderWidth = as.length ? ge.includes(s.label) ? 10 : 0.1 : 2;
           s.pointRadius = 3;
         });
         as.forEach(a => {

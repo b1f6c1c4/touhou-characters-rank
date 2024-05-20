@@ -27,6 +27,7 @@ async function process() {
   const chars = {};
   const sheets = {};
   const ex = {};
+  const groups = {};
   const [logos, workbook] = await Promise.all([
     fs.readFile('logo.json'),
     buffer(gunzip),
@@ -72,6 +73,17 @@ async function process() {
           }
         }
       });
+    } else if (nm === 'groups') {
+      let grp;
+      cl.forEach(({ ['@Row']: r, ['@Col']: c, ['#text']: t }) => {
+        if (c == 0) {
+          grp = t;
+          chars[grp].group = [];
+        } else {
+          chars[grp].group.push(t);
+          groups[t] = grp;
+        }
+      });
     } else {
       const dt = new Date(nm);
       const votes = {};
@@ -82,6 +94,12 @@ async function process() {
           ch = t;
         else if (c == 1) {
           votes[ch] = +t;
+          if (ch in groups) {
+            if (!(groups[ch] in votes))
+              votes[groups[ch]] = t;
+            else
+              votes[groups[ch]] += t;
+          }
           totalVotes += +t;
         }
       });
@@ -109,7 +127,7 @@ async function process() {
     }
   });
   const series = [];
-  Object.entries(chars).forEach(([ch, { g, gm, dt, v, color, co, url, stage }]) => {
+  Object.entries(chars).forEach(([ch, { g, gm, dt, v, color, co, url, stage, group }]) => {
     if (g.length >= 2)
       series.push({
         label: ch,
@@ -120,11 +138,13 @@ async function process() {
         borderColor: color,
         backgroundColor: co,
         aux: {
-          url,
+          url: group ? group.map(c => chars[c].url) : url,
           gm,
           dt,
           v,
           stage,
+          group,
+          grouped: groups[ch],
         },
       });
   });

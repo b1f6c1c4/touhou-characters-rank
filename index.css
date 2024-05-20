@@ -12,6 +12,26 @@ html, body {
   justify-content: center;
   z-index: 114;
 }
+#tooltip .multi {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100px;
+  height: 100px;
+  justify-content: center;
+}
+#tooltip .multi > img {
+  width: 78%;
+  height: 78%;
+  margin: -5% -18%;
+}
+#tooltip .multi > img:last-child {
+  align-self: flex-end;
+}
+#tooltip .multi:has(> :last-child:nth-child(3)) > img {
+  width: 72%;
+  height: 72%;
+  margin: -12% -11%;
+}
 #tooltip > div {
   display: flex;
   flex-direction: row;

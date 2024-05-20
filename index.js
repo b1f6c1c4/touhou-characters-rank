@@ -1,6 +1,7 @@
 const tooltipEl = document.getElementById('tooltip');
 const tmpl = document.getElementById('tooltip-tmpl').innerHTML;
 const closer = document.getElementById('close');
+const menuer = document.querySelector('#menu > span');
 function getContrastColor(c) {
   const color = (c.charAt(0) === '#') ? c.substring(1, 7) : c;
   const R = parseInt(color.substring(0, 2), 16);
@@ -210,5 +211,64 @@ fetch('/touhou.json').then(async (res) => {
     closer.style.visibility = 'hidden';
     theChart.update();
   });
+  menuer.addEventListener('click', () => {
+    document.getElementById('menu').classList.toggle('open');
+  });
+  Array.from(document.querySelectorAll('#menu div span')).forEach(b => b.addEventListener('click', (e) => {
+    const filters = {
+      '1面': (s) => s.aux.stage === 1,
+      '2面': (s) => s.aux.stage === 2,
+      '3面': (s) => s.aux.stage === 3,
+      '4面': (s) => s.aux.stage === 4,
+      '5面': (s) => s.aux.stage === 5,
+      '6面': (s) => s.aux.stage === 6,
+      'EX': (s) => s.aux.stage === 'EX',
+      'N姐妹': (s) => s.aux.group,
+      '整数': (s) => /^东方(?:红魔乡|妖妖梦|永夜抄|花映塚|风神录|地灵殿|星莲船|神灵庙|辉针城|绀珠传|天空璋|鬼形兽|虹龙洞|兽王园)$/.test(s.aux.gm),
+      '小数': (s) => /^东方(?:萃梦想|绯想天|文花帖DS|心绮楼|深秘录|凭依华|刚欲异闻)$/.test(s.aux.gm),
+      '其它': (s) => !/^东方(?:红魔乡|妖妖梦|永夜抄|花映塚|风神录|地灵殿|星莲船|神灵庙|辉针城|绀珠传|天空璋|鬼形兽|虹龙洞|兽王园|萃梦想|绯想天|文花帖DS|心绮楼|深秘录|凭依华|刚欲异闻)$/.test(s.aux.gm),
+    };
+    const t = e.target.innerText;
+    let f;
+    if (t in filters)
+      f = filters[t];
+    else
+      f = (s) => s.aux.gm === '东方' + t;
+    let pos = 0, neg = 0;
+    series.forEach((s, i) => {
+      if (f(s)) {
+        if (partial.has(i))
+          pos++;
+        else
+          neg++;
+      }
+    });
+    console.log(pos, neg);
+    series.forEach((s, i) => {
+      if (f(s)) {
+        if (pos >= neg)
+          partial.delete(i);
+        else
+          partial.add(i);
+      }
+    });
+    theChart.setActiveElements([]);
+    tooltipEl.style.display = 'none';
+    if (partial.size)
+      closer.style.visibility = 'visible';
+    else
+      closer.style.visibility = 'hidden';
+    series.forEach(s => {
+      s.order = 1;
+      s.borderWidth = partial.size ? 0.1 : scaled(2);
+      s.pointRadius = scaled(3);
+    });
+    partial.forEach(a => {
+      const obj = series[a];
+      obj.borderWidth = scaled(5);
+      obj.pointRadius = scaled(8);
+    });
+    theChart.update();
+  }));
   document.querySelector('h1').remove();
 });

@@ -81,9 +81,8 @@ html, body {
   margin-top: -0.1em;
   font-size: 0.8em;
 }
-#close {
+#close, #menu {
   position: fixed;
-  left: 5px;
   bottom: 5px;
   font-size: 30px;
   width: 40px;
@@ -96,6 +95,38 @@ html, body {
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  visibility: hidden;
   cursor: pointer;
+}
+#close {
+  left: 5px;
+  visibility: hidden;
+}
+#menu {
+  right: 5px;
+}
+#menu.open {
+  height: unset;
+  width: max-content;
+  min-width: max-content;
+  flex-wrap: wrap;
+}
+#menu div {
+  display: none;
+  flex-direction: column;
+  max-height: 75vh;
+  overflow-y: auto;
+  align-items: center;
+  width: max-content;
+  min-width: max-content;
+  gap: 0 2px;
+}
+#menu.open div {
+  display: flex;
+}
+#menu div span {
+  font-size: initial;
+}
+#menu > span {
+  width: 100%;
+  text-align: center;
 }

@@ -10,17 +10,20 @@ function getContrastColor(c) {
   const brightness = R * 0.299 + G * 0.587 + B * 0.114 + (1 - A) * 255;
   return brightness > 186 ? "#000000" : "#FFFFFF";
 }
+function scaled(v) {
+  return Math.min(v, v / window.devicePixelRatio);
+}
 Mustache.parse(tmpl);
 fetch('/touhou.json').then(async (res) => {
   const series = await res.json();
   series.forEach(s => {
-    s.borderWidth = 2;
+    s.borderWidth = scaled(2);
     s.showLine = true;
     s.order = 1;
     s.tension = 0.3;
-    s.pointRadius = 3;
+    s.pointRadius = scaled(3);
     if (s.aux.group)
-      s.borderDash = [5, 5];
+      s.borderDash = [scaled(5), scaled(5)];
     if (s.aux.grouped) {
       s.borderColor += '33';
       s.backgroundColor += '33';
@@ -32,7 +35,7 @@ fetch('/touhou.json').then(async (res) => {
       datasets: series,
     },
     options: {
-      pointHitRadius: Math.min(window.innerWidth, window.innerHeight) > 1000 ? 9 : undefined,
+      pointHitRadius: scaled(9),
       animation: false,
       maintainAspectRatio: false,
       scales: {
@@ -51,10 +54,10 @@ fetch('/touhou.json').then(async (res) => {
         legend: {
           labels: {
             font: {
-              size: 8,
+              size: scaled(8),
             },
-            padding: 3,
-            boxWidth: 7,
+            padding: scaled(3),
+            boxWidth: scaled(7),
           },
         },
         tooltip: {
@@ -146,14 +149,14 @@ fetch('/touhou.json').then(async (res) => {
         const ge = as.flatMap(a => series[a.datasetIndex].aux.group);
         series.forEach(s => {
           s.order = 1;
-          s.borderWidth = as.length ? ge.includes(s.label) ? 10 : 0.1 : 2;
-          s.pointRadius = 3;
+          s.borderWidth = as.length ? ge.includes(s.label) ? scaled(10) : 0.1 : scaled(2);
+          s.pointRadius = scaled(3);
         });
         as.forEach(a => {
           const obj = series[a.datasetIndex];
           obj.order = 0;
-          obj.borderWidth = 5;
-          obj.pointRadius = 8;
+          obj.borderWidth = scaled(5);
+          obj.pointRadius = scaled(8);
         });
         chart.update();
       },
@@ -164,8 +167,8 @@ fetch('/touhou.json').then(async (res) => {
     theChart.setActiveElements([]);
     series.forEach(s => {
       s.order = 1;
-      s.borderWidth = 2;
-      s.pointRadius = 3;
+      s.borderWidth = scaled(2);
+      s.pointRadius = scaled(3);
     });
     tooltipEl.style.display = 'none';
     closer.style.visibility = 'hidden';

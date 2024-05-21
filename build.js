@@ -73,6 +73,10 @@ async function process() {
           }
         }
       });
+    } else if (nm === 'race') {
+      cl.forEach(({ ['#text'] : t }) => {
+        chars[t].human = true;
+      });
     } else if (nm === 'groups') {
       let grp;
       cl.forEach(({ ['@Row']: r, ['@Col']: c, ['#text']: t }) => {
@@ -127,7 +131,7 @@ async function process() {
     }
   });
   const series = [];
-  Object.entries(chars).forEach(([ch, { g, gm, dt, v, color, co, url, stage, group }]) => {
+  Object.entries(chars).forEach(([ch, { g, gm, dt, v, color, co, url, stage, group, human }]) => {
     if (g.length >= 2)
       series.push({
         label: ch,
@@ -145,6 +149,7 @@ async function process() {
           stage,
           group,
           grouped: groups[ch],
+          human,
         },
       });
   });

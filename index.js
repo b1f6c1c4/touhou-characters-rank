@@ -43,7 +43,7 @@ fetch('/touhou.json').then(async (res) => {
       scales: {
         x: {
           min: 0,
-          max: 260,
+          max: 275,
         },
         y: {
           type: 'linear',
